@@ -1,0 +1,1 @@
+- [ ] we will have a separate otp model with pre and we will send user otp and url?otp=1234, user can use direct otp or open the link and auto enter.

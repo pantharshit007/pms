@@ -3,12 +3,13 @@ import cookieParser from "cookie-parser";
 import { errMiddleware } from "./middleware/err.middleware";
 import { env } from "./utils/env";
 import { connectDB } from "./lib/db";
+import { rootRouter } from "./routes/root.route";
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// app.use("/api/v1", );
+app.use("/api/v1", rootRouter);
 
 app.get("/", (req, res) => {
   res.json({ msg: "Hey mom!" });
