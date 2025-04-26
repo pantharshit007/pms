@@ -1,3 +1,5 @@
+import { AccountType } from "./role";
+
 type Unit =
   | "Years"
   | "Year"
@@ -34,3 +36,10 @@ type Unit =
 type UnitAnyCase = Unit | Uppercase<Unit> | Lowercase<Unit>;
 
 export type StringValue = `${number}` | `${number}${UnitAnyCase}` | `${number} ${UnitAnyCase}`;
+
+export type UserRequest = {
+  _id: string;
+  username: string;
+  email: string;
+  accountRole: AccountType;
+};

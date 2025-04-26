@@ -1,7 +1,7 @@
 import { z } from "zod";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ path: "./.env" });
 
 const createEnv = (env: NodeJS.ProcessEnv) => {
   const envSchema = z.object({
