@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { apiResponse } from "../utils/api-response";
 
 async function register(req: Request, res: Response) {
+  console.log(req.body);
   return apiResponse({
     res: res,
     success: true,
