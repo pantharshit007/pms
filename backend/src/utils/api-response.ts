@@ -19,7 +19,7 @@ class ApiResponse<T> {
     this.res.status(this.status).json({
       success: this.success,
       message: this.message ?? "Something went wrong",
-      data: this.data,
+      data: this.data ?? null,
     });
   }
 }

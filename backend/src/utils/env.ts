@@ -12,6 +12,7 @@ const createEnv = (env: NodeJS.ProcessEnv) => {
     ACCESS_TOKEN_EXPIRY: z.string().default("30m"),
     REFRESH_TOKEN_SECRET: z.string().nonempty(),
     REFRESH_TOKEN_EXPIRY: z.string().default("7d"),
+    ENCRYPTION_KEY: z.string().nonempty(),
   });
 
   const parsedEnv = envSchema.safeParse(env);
