@@ -5,6 +5,8 @@ interface IOtp {
   otp: string;
   data: string;
   expiresAt: Date;
+
+  sendVerificationEmail: () => Promise<void>;
 }
 
 export type OtpDocument = IOtp & Document;
@@ -31,18 +33,5 @@ const OTPSchema = new Schema<OtpDocument>({
 });
 
 OTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // auto-expire expired otps
-
-async function sendVerificationEmail(email: string) {
-  return;
-}
-
-OTPSchema.pre("save", async function (next) {
-  if (!this.isModified("otp")) {
-    return next();
-  }
-
-  await sendVerificationEmail(this.email);
-  next();
-});
 
 export const Otp = model<OtpDocument>("Otp", OTPSchema);

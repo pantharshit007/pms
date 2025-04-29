@@ -7,12 +7,19 @@ const createEnv = (env: NodeJS.ProcessEnv) => {
   const envSchema = z.object({
     PORT: z.coerce.number().default(5000),
     MONGODB_URI: z.string().nonempty(),
+    CLIENT_URL: z.string().nonempty(),
 
     ACCESS_TOKEN_SECRET: z.string().nonempty(),
     ACCESS_TOKEN_EXPIRY: z.string().default("30m"),
     REFRESH_TOKEN_SECRET: z.string().nonempty(),
     REFRESH_TOKEN_EXPIRY: z.string().default("7d"),
+
     ENCRYPTION_KEY: z.string().nonempty(),
+
+    MAIL_HOST: z.string().nonempty(),
+    MAIL_PORT: z.coerce.number().default(2525),
+    MAIL_USERNAME: z.string().nonempty(),
+    MAIL_PASSWORD: z.string().nonempty(),
   });
 
   const parsedEnv = envSchema.safeParse(env);

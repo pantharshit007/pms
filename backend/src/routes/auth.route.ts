@@ -4,7 +4,7 @@ import { register, login, logout, sendOTP } from "../controllers/auth.controller
 const authRouter = Router();
 
 authRouter.post("/otp", sendOTP);
-authRouter.post("/register", register);
+authRouter.get("/register", register); // /register?otp=1234&email=abc@gmail.com
 authRouter.post("/login", login);
 authRouter.post("/logout", logout);
 
