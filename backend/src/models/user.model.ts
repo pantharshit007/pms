@@ -3,26 +3,28 @@ import { compare, hash } from "bcryptjs";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 
-import { ACCOUNT_TYPES } from "../types/role";
+import { ACCOUNT_ROLES, AccountRole, AccountType } from "../types/role";
 import { resetTokenExpiry } from "../utils/constant";
 import { env } from "../utils/env";
-import { StringValue } from "../types/type";
+import { StringValue, UserRequest } from "../types/type";
 
-type UserDocument = {
+interface IUser {
   fullName: string;
   email: string;
   username: string;
   password: string;
   avatar: string;
-  resetToken: string;
-  resetTokenExpires: Date;
-  accountType: string;
+  resetToken?: string;
+  resetTokenExpires?: Date;
+  accountRole: AccountType;
 
   comparePassword: (password: string) => Promise<boolean>;
   generateResetToken: () => { token: string; hashedToken: string; tokenExpires: Date };
   generateAccessToken: () => string;
   generateRefreshToken: () => string;
-} & Document;
+}
+
+export type UserDocument = IUser & Document;
 
 const userSchema = new Schema<UserDocument>(
   {
@@ -61,11 +63,11 @@ const userSchema = new Schema<UserDocument>(
     },
     resetToken: String,
     resetTokenExpires: Date,
-    accountType: {
+    accountRole: {
       type: String,
       required: true,
-      enum: Object.values(ACCOUNT_TYPES),
-      default: ACCOUNT_TYPES.user,
+      enum: AccountRole,
+      default: ACCOUNT_ROLES.user,
     },
   },
   { timestamps: true }
@@ -102,10 +104,11 @@ userSchema.methods.generateResetToken = function () {
 };
 
 userSchema.methods.generateAccessToken = function () {
-  const payload = {
+  const payload: UserRequest = {
     _id: this._id,
     username: this.username,
     email: this.email,
+    accountRole: this.accountRole,
   };
 
   return jwt.sign(payload, env.ACCESS_TOKEN_SECRET, {

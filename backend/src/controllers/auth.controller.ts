@@ -1,6 +1,6 @@
 import { CookieOptions, Request, Response } from "express";
 import { apiResponse } from "../utils/api-response";
-import { RegisterSchema } from "../types/auth-schema";
+import { OtpSchema, RegisterSchema } from "../types/auth-schema";
 import { CustomError } from "../utils/custom-error";
 import { User } from "../models/user.model";
 import { generateOtp } from "../utils/otp-generate";
@@ -11,7 +11,7 @@ import { sendVerificationEmail } from "../utils/send-mail";
 
 async function sendOTP(req: Request, res: Response) {
   try {
-    const parsedBody = RegisterSchema.safeParse(req.body);
+    const parsedBody = OtpSchema.safeParse(req.body);
     if (!parsedBody.success) {
       throw new CustomError(
         400,
@@ -80,11 +80,13 @@ async function register(req: Request, res: Response) {
   try {
     const otp = req.query.otp as string;
     const email = req.query.email as string;
-    if (!otp) {
-      throw new CustomError(400, "Invalid OTP");
-    }
-    if (!email) {
-      throw new CustomError(400, "Invalid email");
+
+    const data = RegisterSchema.safeParse({ email, otp });
+    if (!data.success) {
+      throw new CustomError(
+        400,
+        data.error.errors.map((err) => err.path + ":" + err.message).join("\n")
+      );
     }
 
     const otpRecord = await Otp.findOne({ email, expiresAt: { $gt: new Date() } }).lean();

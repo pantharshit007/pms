@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const RegisterSchema = z.object({
+export const OtpSchema = z.object({
   email: z
     .string()
     .email()
@@ -14,8 +14,23 @@ export const RegisterSchema = z.object({
     .min(6, { message: "Password must be at least 6 characters long" }),
 });
 
+export const RegisterSchema = z.object({
+  email: z
+    .string()
+    .email()
+    .regex(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/, {
+      message: "Invalid email",
+    }),
+  otp: z.coerce.number().min(5).max(6, { message: "OTP must be between 6 digits long" }),
+});
+
 export const LoginSchema = z.object({
-  email: z.string().email({ message: "Invalid email" }),
+  email: z
+    .string()
+    .email()
+    .regex(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/, {
+      message: "Invalid email",
+    }),
   password: z
     .string({ invalid_type_error: "Invalid password" })
     .min(6, { message: "Password must be at least 6 characters long" }),
