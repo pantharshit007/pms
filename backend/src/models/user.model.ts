@@ -14,6 +14,7 @@ interface IUser {
   username: string;
   password: string;
   avatar: string;
+  refreshToken?: string;
   resetToken?: string;
   resetTokenExpires?: Date;
   accountRole: AccountType;
@@ -53,14 +54,13 @@ const userSchema = new Schema<UserDocument>(
     password: {
       type: String,
       required: true,
-      minlength: 6,
-      maxlength: 16,
       trim: true,
     },
     avatar: {
       type: String,
       default: "",
     },
+    refreshToken: String,
     resetToken: String,
     resetTokenExpires: Date,
     accountRole: {

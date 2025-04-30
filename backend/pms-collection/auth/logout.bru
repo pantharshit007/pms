@@ -1,0 +1,11 @@
+meta {
+  name: logout
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{host}}/{{v1}}/auth/logout
+  body: json
+  auth: none
+}

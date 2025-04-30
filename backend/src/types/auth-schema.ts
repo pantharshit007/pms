@@ -11,7 +11,8 @@ export const OtpSchema = z.object({
   username: z.string().min(4, { message: "Username must be at least 4 characters long" }),
   password: z
     .string({ invalid_type_error: "Invalid password" })
-    .min(6, { message: "Password must be at least 6 characters long" }),
+    .min(6, { message: "Password must be at least 6 characters long" })
+    .max(16, { message: "Password must be at most 16 characters long" }),
 });
 
 export const RegisterSchema = z.object({
@@ -21,7 +22,7 @@ export const RegisterSchema = z.object({
     .regex(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/, {
       message: "Invalid email",
     }),
-  otp: z.coerce.number().min(5).max(6, { message: "OTP must be between 6 digits long" }),
+  otp: z.string().regex(/^[0-9]{6}$/, { message: "Invalid OTP" }),
 });
 
 export const LoginSchema = z.object({
@@ -33,5 +34,6 @@ export const LoginSchema = z.object({
     }),
   password: z
     .string({ invalid_type_error: "Invalid password" })
-    .min(6, { message: "Password must be at least 6 characters long" }),
+    .min(6, { message: "Password must be at least 6 characters long" })
+    .max(16, { message: "Password must be at most 16 characters long" }),
 });

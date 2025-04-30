@@ -8,6 +8,7 @@ const createEnv = (env: NodeJS.ProcessEnv) => {
     PORT: z.coerce.number().default(5000),
     MONGODB_URI: z.string().nonempty(),
     CLIENT_URL: z.string().nonempty(),
+    NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
 
     ACCESS_TOKEN_SECRET: z.string().nonempty(),
     ACCESS_TOKEN_EXPIRY: z.string().default("30m"),

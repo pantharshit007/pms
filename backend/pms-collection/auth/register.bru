@@ -4,13 +4,18 @@ meta {
   seq: 1
 }
 
-get {
-  url: {{host}}/{{v1}}/auth/register?otp=517741&email=random@gmail.com
+post {
+  url: {{host}}/{{v1}}/auth/register?otp=085354
   body: json
   auth: none
 }
 
 params:query {
-  otp: 517741
-  email: random@gmail.com
+  otp: 085354
+}
+
+body:json {
+  {
+    "email":"random@gmail.com"
+  }
 }

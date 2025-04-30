@@ -1,13 +1,14 @@
 import { CookieOptions, Request, Response } from "express";
 import { apiResponse } from "../utils/api-response";
-import { OtpSchema, RegisterSchema } from "../types/auth-schema";
+import { LoginSchema, OtpSchema, RegisterSchema } from "../types/auth-schema";
 import { CustomError } from "../utils/custom-error";
 import { User } from "../models/user.model";
 import { generateOtp } from "../utils/otp-generate";
 import { decrypt, encrypt } from "../utils/crypt";
-import { otpExpiry } from "../utils/constant";
+import { COOKIE_EXPIRY, otpExpiry } from "../utils/constant";
 import { Otp } from "../models/otp.model";
 import { sendVerificationEmail } from "../utils/send-mail";
+import { env } from "../utils/env";
 
 async function sendOTP(req: Request, res: Response) {
   try {
@@ -79,7 +80,7 @@ async function sendOTP(req: Request, res: Response) {
 async function register(req: Request, res: Response) {
   try {
     const otp = req.query.otp as string;
-    const email = req.query.email as string;
+    const email = req.body.email;
 
     const data = RegisterSchema.safeParse({ email, otp });
     if (!data.success) {
@@ -108,15 +109,30 @@ async function register(req: Request, res: Response) {
       email,
     });
 
-    newUser.password = "********";
     await Otp.deleteOne({ email });
+
+    const accessToken = newUser.generateAccessToken();
+    const refreshToken = newUser.generateRefreshToken();
+
+    newUser.refreshToken = refreshToken;
+    await newUser.save();
+
+    const options: CookieOptions = {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      maxAge: COOKIE_EXPIRY,
+      path: "/",
+      sameSite: "strict",
+    };
+
+    res.cookie("accessToken", accessToken, options);
+    res.cookie("refreshToken", refreshToken, options);
 
     return apiResponse({
       res: res,
       success: true,
-      status: 200,
+      status: 201,
       message: "Registered success!",
-      data: newUser,
     });
   } catch (err) {
     console.error("[REGISTER] Error:", err);
@@ -134,22 +150,75 @@ async function register(req: Request, res: Response) {
 }
 
 async function login(req: Request, res: Response) {
-  return apiResponse({
-    res: res,
-    success: true,
-    status: 200,
-    message: "Logged in successfully",
-    data: null,
-  });
+  try {
+    const parsedBody = LoginSchema.safeParse(req.body);
+    if (!parsedBody.success) {
+      throw new CustomError(
+        400,
+        parsedBody.error.errors.map((err) => err.path + ":" + err.message).join("\n")
+      );
+    }
+
+    const { email, password } = parsedBody.data;
+
+    const user = await User.findOne({ email });
+
+    if (!user) throw new CustomError(400, "Invalid email or password");
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) throw new CustomError(400, "Invalid email or password");
+
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    const options: CookieOptions = {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      maxAge: COOKIE_EXPIRY,
+      path: "/",
+      sameSite: "strict",
+    };
+
+    res.cookie("accessToken", accessToken, options);
+    res.cookie("refreshToken", refreshToken, options);
+
+    return apiResponse({
+      res: res,
+      success: true,
+      status: 200,
+      message: "Login success!",
+    });
+  } catch (err) {
+    console.error("[LOGIN] Error:", err);
+    if (err instanceof CustomError) {
+      return apiResponse({
+        res,
+        success: false,
+        status: err.status ?? 500,
+        message: err.message,
+      });
+    }
+
+    throw err;
+  }
 }
 
 async function logout(req: Request, res: Response) {
+  const userId = req.user?._id;
+
+  await User.findOneAndUpdate({ _id: userId }, { refreshToken: null });
+
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+
   return apiResponse({
     res: res,
     success: true,
     status: 200,
-    message: "Logged out successfully",
-    data: null,
+    message: "Logout success!",
   });
 }
 
