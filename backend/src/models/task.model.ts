@@ -7,10 +7,10 @@ interface Attatchment {
   size: number;
 }
 
-interface ITask {
+export interface ITask {
   title: string;
   description: string;
-  project: Schema.Types.ObjectId;
+  projectId: Schema.Types.ObjectId;
   assignedTo: Schema.Types.ObjectId;
   assignedBy: Schema.Types.ObjectId;
   status: TaskStatusType;
@@ -25,13 +25,18 @@ const taskSchema = new Schema<TaskDocument>(
       type: String,
       required: true,
       trim: true,
+      unique: true,
+      minlength: 3,
+      maxlength: 30,
     },
     description: {
       type: String,
       required: true,
       trim: true,
+      minlength: 3,
+      maxlength: 1000,
     },
-    project: {
+    projectId: {
       type: Schema.Types.ObjectId,
       ref: "Project",
       required: true,

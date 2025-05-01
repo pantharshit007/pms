@@ -1,14 +1,14 @@
 import { Schema, model, Document } from "mongoose";
 
-interface Subtask {
+export interface ISubtask {
   title: string;
-  task: Schema.Types.ObjectId;
+  taskId: Schema.Types.ObjectId;
   description: string;
   isComplete: boolean;
   createdBy: Schema.Types.ObjectId;
 }
 
-export type SubtaskDocument = Subtask & Document;
+export type SubtaskDocument = ISubtask & Document;
 
 const subtaskSchema = new Schema<SubtaskDocument>(
   {
@@ -16,8 +16,10 @@ const subtaskSchema = new Schema<SubtaskDocument>(
       type: String,
       required: true,
       trim: true,
+      minlength: 3,
+      maxlength: 30,
     },
-    task: {
+    taskId: {
       type: Schema.Types.ObjectId,
       ref: "Task",
       required: true,
@@ -26,6 +28,8 @@ const subtaskSchema = new Schema<SubtaskDocument>(
       type: String,
       required: true,
       trim: true,
+      minlength: 3,
+      maxlength: 1000,
     },
     isComplete: {
       type: Boolean,

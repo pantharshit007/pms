@@ -207,19 +207,32 @@ async function login(req: Request, res: Response) {
 }
 
 async function logout(req: Request, res: Response) {
-  const userId = req.user?._id;
+  try {
+    const userId = req.user?._id;
 
-  await User.findOneAndUpdate({ _id: userId }, { refreshToken: null });
+    await User.findOneAndUpdate({ _id: userId }, { refreshToken: null });
 
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
 
-  return apiResponse({
-    res: res,
-    success: true,
-    status: 200,
-    message: "Logout success!",
-  });
+    return apiResponse({
+      res: res,
+      success: true,
+      status: 200,
+      message: "Logout success!",
+    });
+  } catch (err) {
+    console.error("[LOGOUT] Error:", err);
+    if (err instanceof CustomError) {
+      return apiResponse({
+        res,
+        success: false,
+        status: err.status ?? 500,
+        message: err.message,
+      });
+    }
+    throw err;
+  }
 }
 
 export { sendOTP, register, login, logout };
