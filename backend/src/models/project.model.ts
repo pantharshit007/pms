@@ -1,7 +1,7 @@
 import { Document, model, Schema } from "mongoose";
 import { UserDocument } from "./user.model";
 
-interface IProject {
+export interface IProject {
   name: string;
   description: string;
   createdBy: Schema.Types.ObjectId;
@@ -21,7 +21,6 @@ const projectSchema = new Schema<ProjectDocument>(
     name: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
     description: {
@@ -38,4 +37,5 @@ const projectSchema = new Schema<ProjectDocument>(
   { timestamps: true }
 );
 
+projectSchema.index({ name: 1, createdBy: 1 }, { unique: true }); // no duplicates on same user
 export const Project = model<ProjectDocument>("Project", projectSchema);

@@ -1,6 +1,6 @@
 import { CookieOptions, Request, Response } from "express";
 import { apiResponse } from "../utils/api-response";
-import { LoginSchema, OtpSchema, RegisterSchema } from "../types/auth-schema";
+import { LoginSchema, OtpSchema, RegisterSchema } from "../validations/auth-schema";
 import { CustomError } from "../utils/custom-error";
 import { User } from "../models/user.model";
 import { generateOtp } from "../utils/otp-generate";
@@ -80,15 +80,16 @@ async function sendOTP(req: Request, res: Response) {
 async function register(req: Request, res: Response) {
   try {
     const otp = req.query.otp as string;
-    const email = req.body.email;
 
-    const data = RegisterSchema.safeParse({ email, otp });
-    if (!data.success) {
+    const parsedData = RegisterSchema.safeParse({ email: req.body.email, otp });
+    if (!parsedData.success) {
       throw new CustomError(
         400,
-        data.error.errors.map((err) => err.path + ":" + err.message).join("\n")
+        parsedData.error.errors.map((err) => err.path + ":" + err.message).join("\n")
       );
     }
+
+    const { email } = parsedData.data;
 
     const otpRecord = await Otp.findOne({ email, expiresAt: { $gt: new Date() } }).lean();
     if (!otpRecord) {
@@ -158,7 +159,6 @@ async function login(req: Request, res: Response) {
         parsedBody.error.errors.map((err) => err.path + ":" + err.message).join("\n")
       );
     }
-
     const { email, password } = parsedBody.data;
 
     const user = await User.findOne({ email });

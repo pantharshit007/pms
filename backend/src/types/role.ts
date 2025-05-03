@@ -8,8 +8,8 @@ export const AccountRole = Object.values(ACCOUNT_ROLES);
 export type AccountType = (typeof ACCOUNT_ROLES)[keyof typeof ACCOUNT_ROLES];
 
 export const PROJECT_ROLES = {
-  admin: "ADMIN",
-  project_manager: "PROJECT_MANAGER",
+  lead: "LEAD",
+  manager: "MANAGER",
   member: "MEMBER",
 } as const;
 

@@ -1,2 +1,4 @@
 - [ ] we will have a separate otp model with pre and we will send user otp and url?otp=1234, user can use direct otp or open the link and auto enter.
 - [ ] check for confilicting cases like multiple users assigning on the same task or sub task.
+- [ ] need to make some changes in `/all` of project router, since we need to show each user number of projects they are enrolled in with resp. id's so when they select a project, we can show them info of that `pId` project.
+- [ ] update delete project api, to delete all the members, subtasks, tasks, notes, attachments, etc. of the project.

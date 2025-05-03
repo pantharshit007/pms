@@ -14,7 +14,7 @@ type PermissionCheck<TResouce> =
   | boolean
   | ((context: PermissionContext<TResouce> & { resource: TResouce }) => boolean);
 
-type ProjectActions = "create" | "view" | "update" | "delete";
+type ProjectActions = "create" | "view" | "update" | "delete" | "memberUpdate";
 type NoteActions = "create" | "view" | "update" | "delete";
 type TaskActions = "create" | "view" | "update" | "delete" | "updateStatus";
 type SubTaskActions = "create" | "view" | "update" | "delete" | "complete";
@@ -24,7 +24,7 @@ type NotePermission<T> = Partial<Record<NoteActions, PermissionCheck<T>>>;
 type TaskPermission<T> = Partial<Record<TaskActions, PermissionCheck<T>>>;
 type SubTaskPermission<T> = Partial<Record<SubTaskActions, PermissionCheck<T>>>;
 
-type PermissionSchema<T = any> = {
+export type PermissionSchema<T = any> = {
   Project: ProjectPermission<T>;
   Note: NotePermission<T>;
   Task: TaskPermission<T>;
@@ -39,19 +39,20 @@ type AllowedActions = {
 };
 
 // bit complex: specific action for specific resource
-type ActionForResource<R extends keyof PermissionSchema> = AllowedActions[R];
+export type ActionForResource<R extends keyof PermissionSchema> = AllowedActions[R];
 
 type RolesWithPermission = {
   [key in ProjectRoleType]: PermissionSchema;
 };
 
 const PERMINSSIONS = {
-  [PROJECT_ROLES.admin]: {
+  [PROJECT_ROLES.lead]: {
     Project: {
       create: true,
       view: true,
       update: true,
       delete: true,
+      memberUpdate: true,
     },
     Note: {
       create: true,
@@ -74,8 +75,8 @@ const PERMINSSIONS = {
       complete: true,
     },
   },
-  [PROJECT_ROLES.project_manager]: {
-    Project: { view: true },
+  [PROJECT_ROLES.manager]: {
+    Project: { view: true, memberUpdate: true },
     Note: {
       create: true,
       view: true,
@@ -149,12 +150,12 @@ export type HasPermissionType<
 
 /**
  * Check if user has permission to perform action on resource
- * @user - User Request
- * @memberShip - Membership of the user, undefined for `resourceType=SubTask`
- * @resourceType - Resource Type
- * @action - Action `create`, `view`, `update`, `delete`, `updateStatus`, `complete`
- * @resource - Resource for the action `(fn)`
- * @returns
+ * @user User Request
+ * @memberShip Membership of the user, undefined for `resourceType=SubTask`
+ * @resourceType `Project | Note | Task | SubTask`
+ * @action Action `create`, `view`, `update`, `delete`, `updateStatus`, `complete`
+ * @resource Resource for the action `(fn)`
+ * @returns Boolean
  */
 function hasPermission<
   R extends keyof PermissionSchema,
@@ -165,11 +166,6 @@ function hasPermission<
 
   const accountRole = user.accountRole;
   const projectRole = memberShip ? memberShip.role : PROJECT_ROLES.member;
-
-  // only `PRO` or `ADMIN` can create project
-  if (resourceType === "Project" && action === "create") {
-    return ["PRO", "ADMIN"].includes(accountRole);
-  }
 
   const rolePermission = PERMINSSIONS[projectRole];
   if (!rolePermission) return false;

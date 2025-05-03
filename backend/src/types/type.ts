@@ -1,4 +1,5 @@
-import { AccountType } from "./role";
+import { Schema } from "mongoose";
+import { AccountType, ProjectRoleType } from "./role";
 
 type Unit =
   | "Years"
@@ -42,4 +43,29 @@ export type UserRequest = {
   username: string;
   email: string;
   accountRole: AccountType;
+};
+
+// \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\ // \\
+
+export type fetchMyProjectsAPI = {
+  role: ProjectRoleType;
+  totalMembers: number;
+  pId: Schema.Types.ObjectId;
+  name: string;
+  description: string;
+  createdBy: { email: string; username: string };
+};
+
+type getProjectMembersArrAPI = {
+  _id: Schema.Types.ObjectId;
+  email: string;
+  username: string;
+  fullName: string;
+  avatar: string;
+  role: ProjectRoleType;
+};
+
+export type getProjectMembersAPI = {
+  totalMembers: number;
+  members: getProjectMembersArrAPI[];
 };
