@@ -15,7 +15,7 @@ export function errMiddleware(err: Error, req: Request, res: Response, next: Nex
 
   res.status(500).json({
     success: false,
-    message: "Something went wrong",
+    message: err.message ?? "Something went wrong",
   });
 
   next();

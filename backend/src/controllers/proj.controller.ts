@@ -220,6 +220,8 @@ async function updateProject(req: Request, res: Response) {
     if (name) payload.name = name;
     if (description) payload.description = description;
 
+    if (Object.keys(payload).length === 0) throw new CustomError(400, "No changes made");
+
     const project = await Project.findByIdAndUpdate(pId, payload, { new: true });
     if (!project) throw new CustomError(400, "Failed to update project");
 

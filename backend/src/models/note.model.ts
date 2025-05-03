@@ -3,7 +3,8 @@ import { model, Schema, Document } from "mongoose";
 interface INote {
   createdBy: Schema.Types.ObjectId;
   project: Schema.Types.ObjectId;
-  content: string;
+  title: string;
+  description: string;
 }
 
 export type NoteDocument = INote & Document;
@@ -20,9 +21,19 @@ const noteSchema = new Schema<NoteDocument>(
       ref: "Project",
       required: true,
     },
-    content: {
+    title: {
       type: String,
       required: true,
+      trim: true,
+      minlength: 2,
+      maxlength: 30,
+    },
+    description: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 2,
+      maxlength: 500,
     },
   },
   { timestamps: true }
