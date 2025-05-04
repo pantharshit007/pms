@@ -3,3 +3,4 @@
 - [ ] need to make some changes in `/all` of project router, since we need to show each user number of projects they are enrolled in with resp. id's so when they select a project, we can show them info of that `pId` project.
 - [ ] update delete project api, to delete all the members, subtasks, tasks, notes, attachments, etc. of the project.
 - [ ] update proj member api, to have `username` in response.
+- [ ] allow user to upload avatar img in profile.

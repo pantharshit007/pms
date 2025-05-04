@@ -21,6 +21,10 @@ const createEnv = (env: NodeJS.ProcessEnv) => {
     MAIL_PORT: z.coerce.number().default(2525),
     MAIL_USERNAME: z.string().nonempty(),
     MAIL_PASSWORD: z.string().nonempty(),
+
+    CLOUD_NAME: z.string().nonempty(),
+    API_KEY: z.string().nonempty(),
+    API_SECRET: z.string().nonempty(),
   });
 
   const parsedEnv = envSchema.safeParse(env);
