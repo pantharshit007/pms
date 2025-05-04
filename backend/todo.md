@@ -4,3 +4,7 @@
 - [ ] update delete project api, to delete all the members, subtasks, tasks, notes, attachments, etc. of the project.
 - [ ] update proj member api, to have `username` in response.
 - [ ] allow user to upload avatar img in profile.
+- [ ] write the deleteUser controller.
+- [ ] write the refreshToken controller.
+- [ ] update the `updateTask` controller in future we will only add those who are part of the project from the frontend with a dropdown or search, no more adding random peopl, same for `createTask` controller.
+- [ ] add option to replace images in task.

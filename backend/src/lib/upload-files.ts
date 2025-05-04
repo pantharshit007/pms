@@ -42,7 +42,7 @@ async function uploadFile(file: Express.Multer.File, role: AccountType, info: in
     if (!checkSize(file, maxSize)) {
       throw new CustomError(
         400,
-        `File ${file.originalname} exceeds max size for your role (${maxSize / 1024} MB)`
+        `File ${file.originalname} exceeds max size for your account plan (${maxSize / 1024} MB)`
       );
     }
 
@@ -60,7 +60,7 @@ async function uploadFile(file: Express.Multer.File, role: AccountType, info: in
 
     const response = await cloudinary.uploader.upload(file.path, options);
 
-    fs.unlink(file.path, () => {});
+    await fs.unlink(file.path, () => {});
     return response;
   } catch (err: any) {
     fs.unlinkSync(file.path);

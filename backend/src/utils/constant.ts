@@ -6,14 +6,15 @@ export const otpExpiry = 10 * 60 * 1000;
 
 export const COOKIE_EXPIRY = 1000 * 60 * 60 * 24 * 7;
 
-export const TaskStatus = {
+export const TASK_STATUS = {
   planning: "PLANNING",
   in_progress: "IN_PROGRESS",
   completed: "COMPLETED",
   cancelled: "CANCELLED",
 };
 
-export type TaskStatusType = (typeof TaskStatus)[keyof typeof TaskStatus];
+export type TaskStatusType = (typeof TASK_STATUS)[keyof typeof TASK_STATUS];
+export const TaskStatus = Object.values(TASK_STATUS);
 
 export const allowedMimeTypes = [
   "image/png",

@@ -12,7 +12,13 @@ export const ProjectSchema = z.object({
     .max(1000, { message: "Description must be at most 1000 characters long" }),
 });
 
-export const updateProjectSchema = ProjectSchema.partial();
+export const updateProjectSchema = ProjectSchema.partial().refine(
+  (data) => data.name || data.description,
+  {
+    message: "At least one field must be provided to update the project.",
+    path: [],
+  }
+);
 
 export const addProjectMemberSchema = z.object({
   email: z

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { CustomError } from "../utils/custom-error";
 import { Types } from "mongoose";
 import { ProjectMember } from "../models/member.model";
+import { apiResponse } from "../utils/api-response";
 
 /**
  * Middleware to check if user is a member of the project and attach project-member context to the request
@@ -20,7 +21,14 @@ const projCtxMiddleware = async (req: Request, res: Response, next: NextFunction
       user: new Types.ObjectId(userId),
     }).lean();
 
-    if (!member) throw new CustomError(401, "Not Found: Not a member of this project");
+    if (!member) {
+      return apiResponse({
+        res,
+        success: false,
+        status: 401,
+        message: "Not Found: Not a member of this project",
+      });
+    }
 
     req.member = member;
     next();

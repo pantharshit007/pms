@@ -24,7 +24,12 @@ const fileFilter: multer.Options["fileFilter"] = (req, file, cb) => {
   // Restrict pro-only files
   const allowedRoles = ["PRO", "ADMIN"];
   if (proOnlyMimeTypes.includes(file.mimetype) && !allowedRoles.includes(req.user!.accountRole)) {
-    return cb(new CustomError(400, "This file type is restricted to PRO users"));
+    return cb(
+      new CustomError(
+        400,
+        "You found a PRO only feature! Upgrade your plan to access this feature."
+      )
+    );
   }
 
   cb(null, true);

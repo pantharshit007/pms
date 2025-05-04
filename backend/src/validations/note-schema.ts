@@ -1,4 +1,4 @@
-import { optional, z } from "zod";
+import { z } from "zod";
 
 export const NoteSchema = z.object({
   title: z
@@ -11,4 +11,10 @@ export const NoteSchema = z.object({
     .max(500, { message: "Description must be at most 500 characters long" }),
 });
 
-export const updateNoteSchema = NoteSchema.partial();
+export const updateNoteSchema = NoteSchema.partial().refine(
+  (data) => data.title || data.description,
+  {
+    message: "At least one field must be provided to update the note.",
+    path: [],
+  }
+);

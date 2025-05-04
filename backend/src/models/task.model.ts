@@ -1,5 +1,5 @@
 import { model, Schema, Document } from "mongoose";
-import { TaskStatus, TaskStatusType } from "../utils/constant";
+import { TASK_STATUS, TaskStatus, TaskStatusType } from "../utils/constant";
 
 interface Attatchment {
   url: string;
@@ -10,7 +10,7 @@ interface Attatchment {
 export interface ITask {
   title: string;
   description: string;
-  projectId: Schema.Types.ObjectId;
+  project: Schema.Types.ObjectId;
   assignedTo: Schema.Types.ObjectId;
   assignedBy: Schema.Types.ObjectId;
   status: TaskStatusType;
@@ -26,17 +26,17 @@ const taskSchema = new Schema<TaskDocument>(
       required: true,
       trim: true,
       unique: true,
-      minlength: 3,
+      minlength: 2,
       maxlength: 30,
     },
     description: {
       type: String,
       required: true,
       trim: true,
-      minlength: 3,
+      minlength: 2,
       maxlength: 1000,
     },
-    projectId: {
+    project: {
       type: Schema.Types.ObjectId,
       ref: "Project",
       required: true,
@@ -54,7 +54,8 @@ const taskSchema = new Schema<TaskDocument>(
     status: {
       type: String,
       required: true,
-      enum: Object.values(TaskStatus),
+      enum: TaskStatus,
+      default: TASK_STATUS.planning,
     },
     attachments: {
       type: [
@@ -64,7 +65,6 @@ const taskSchema = new Schema<TaskDocument>(
           size: { type: Number },
         },
       ],
-      required: true,
     },
   },
   { timestamps: true }
