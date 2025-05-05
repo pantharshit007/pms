@@ -31,4 +31,5 @@ const projectMemberSchema = new Schema<MemberDocument>(
   { timestamps: true }
 );
 
+projectMemberSchema.index({ project: 1, user: 1 });
 export const ProjectMember = model<MemberDocument>("ProjectMember", projectMemberSchema);

@@ -1,25 +1,25 @@
 import { Schema, model, Document } from "mongoose";
 
-export interface ISubtask {
+export interface ISubTask {
   title: string;
-  taskId: Schema.Types.ObjectId;
+  task: Schema.Types.ObjectId;
   description: string;
   isComplete: boolean;
   createdBy: Schema.Types.ObjectId;
 }
 
-export type SubtaskDocument = ISubtask & Document;
+export type SubTaskDocument = ISubTask & Document;
 
-const subtaskSchema = new Schema<SubtaskDocument>(
+const subTaskSchema = new Schema<SubTaskDocument>(
   {
     title: {
       type: String,
       required: true,
       trim: true,
-      minlength: 3,
+      minlength: 2,
       maxlength: 30,
     },
-    taskId: {
+    task: {
       type: Schema.Types.ObjectId,
       ref: "Task",
       required: true,
@@ -28,12 +28,13 @@ const subtaskSchema = new Schema<SubtaskDocument>(
       type: String,
       required: true,
       trim: true,
-      minlength: 3,
+      minlength: 2,
       maxlength: 1000,
     },
     isComplete: {
       type: Boolean,
       required: true,
+      default: false,
     },
     createdBy: {
       type: Schema.Types.ObjectId,
@@ -44,4 +45,4 @@ const subtaskSchema = new Schema<SubtaskDocument>(
   { timestamps: true }
 );
 
-export const Subtask = model<SubtaskDocument>("Subtask", subtaskSchema);
+export const SubTask = model<SubTaskDocument>("SubTask", subTaskSchema);

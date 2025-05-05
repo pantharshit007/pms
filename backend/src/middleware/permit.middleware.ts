@@ -24,12 +24,12 @@ function permit<R extends ExcludedResouce, A extends ActionForResource<R> = Acti
     if (typeof action !== "string") throw new CustomError(400, "Invalid Action"); // no func allowed here
 
     const isAllowed = hasPermission<ExcludedResouce, A>({ user, memberShip, resourceType, action });
-    if (!isAllowed) {
+    if (!isAllowed.success) {
       return apiResponse({
         res,
         success: false,
         status: 401,
-        message: "Unauthorized: Insufficient permissions",
+        message: isAllowed.message,
       });
     }
 

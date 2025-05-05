@@ -1,10 +1,24 @@
 import { Router } from "express";
+import {
+  createSubTask,
+  getSubTaskById,
+  getMySubTasks,
+  updateSubTask,
+  deleteSubTask,
+  completeSubTask,
+} from "../controllers/subTask.controller";
+import { projCtxMiddleware } from "../middleware/proj-ctx.middleware";
 
 const subTaskRouter = Router({ mergeParams: true });
 
-subTaskRouter.get("/", (req, res) => {
-  const { pId, tId, sId } = req.params as { pId: string; tId: string; sId: string };
-  res.send(`Project ID: ${pId}, Task ID: ${tId}, Subtask ID: ${sId}`);
-});
+subTaskRouter.post("/create", createSubTask);
+subTaskRouter.get("/mine", getMySubTasks);
+
+subTaskRouter.use("/", projCtxMiddleware);
+
+subTaskRouter.get("/get/:sId", getSubTaskById);
+subTaskRouter.patch("/update/:sId", updateSubTask);
+subTaskRouter.delete("/delete/:sId", deleteSubTask);
+subTaskRouter.patch("/complete/:sId", completeSubTask);
 
 export { subTaskRouter };

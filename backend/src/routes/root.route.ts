@@ -15,7 +15,7 @@ rootRouter.use("/proj", authMiddleware, projectRouter);
 rootRouter.use("/proj/:pId/note", authMiddleware, noteRouter);
 //? task: /proj/:pId/task/[action]/:tId
 rootRouter.use("/proj/:pId/task", authMiddleware, taskRouter);
-//? subtask: /task/:tId/subtask/[action]/:sId
-rootRouter.use("/task/:tId/subtask", authMiddleware, subTaskRouter);
+//? subtask: /proj/:pId/task/:tId/subtask/[action]/:sId
+rootRouter.use("/proj/:pId/task/:tId/subtask", authMiddleware, subTaskRouter);
 
 export { rootRouter };

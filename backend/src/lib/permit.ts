@@ -1,7 +1,7 @@
 import { UserRequest } from "../types/type";
-import { ACCOUNT_ROLES, PROJECT_ROLES, ProjectRoleType } from "../types/role";
+import { PROJECT_ROLES, ProjectRoleType } from "../types/role";
 import { ITask } from "../models/task.model";
-import { ISubtask } from "../models/subtask.model";
+import { ISubTask } from "../models/subtask.model";
 import { IMember } from "../models/member.model";
 
 interface PermissionContext<TResouce = any> {
@@ -112,26 +112,26 @@ const PERMINSSIONS = {
     },
     SubTask: {
       create: true,
-      view: (ctx: PermissionContext<ISubtask & { tId: string }>) => {
+      view: (ctx: PermissionContext<ISubTask & { tId: string }>) => {
         return checkSubTaskPermission(ctx);
       },
-      update: (ctx: PermissionContext<ISubtask & { tId: string }>) => {
+      update: (ctx: PermissionContext<ISubTask & { tId: string }>) => {
         return checkSubTaskPermission(ctx);
       },
-      delete: (ctx: PermissionContext<ISubtask & { tId: string }>) => {
+      delete: (ctx: PermissionContext<ISubTask & { tId: string }>) => {
         return checkSubTaskPermission(ctx);
       },
-      complete: (ctx: PermissionContext<ISubtask & { tId: string }>) => {
+      complete: (ctx: PermissionContext<ISubTask & { tId: string }>) => {
         return checkSubTaskPermission(ctx);
       },
     },
   },
 } satisfies RolesWithPermission;
 
-const checkSubTaskPermission = (ctx: PermissionContext<ISubtask & { tId: string }>) => {
-  if (!ctx?.resource?.taskId || !ctx?.resource?.tId) return false;
+const checkSubTaskPermission = (ctx: PermissionContext<ISubTask & { tId: string }>) => {
+  if (!ctx?.resource?.task || !ctx?.resource?.tId) return false;
   return (
-    ctx.resource.taskId.toString() === ctx.resource.tId.toString() &&
+    ctx.resource.task.toString() === ctx.resource.tId.toString() &&
     ctx.resource.createdBy.toString() === ctx.user._id.toString()
   );
 };
@@ -142,7 +142,7 @@ export type HasPermissionType<
   TResouce = any,
 > = {
   user: UserRequest;
-  memberShip: R extends "SubTask" ? undefined : IMember;
+  memberShip: IMember | undefined;
   resourceType: R;
   action: A;
   resource?: TResouce;
@@ -151,7 +151,7 @@ export type HasPermissionType<
 /**
  * Check if user has permission to perform action on resource
  * @user User Request
- * @memberShip Membership of the user, undefined for `resourceType=SubTask`
+ * @memberShip Membership of the user
  * @resourceType `Project | Note | Task | SubTask`
  * @action Action `create`, `view`, `update`, `delete`, `updateStatus`, `complete`
  * @resource Resource for the action `(fn)`
@@ -161,36 +161,40 @@ function hasPermission<
   R extends keyof PermissionSchema,
   A extends ActionForResource<R>,
   TResouce = any,
->(params: HasPermissionType<R, A>): boolean {
+>(params: HasPermissionType<R, A>): { success: boolean; message: string } {
   const { user, resourceType, action, memberShip, resource } = params;
 
-  const accountRole = user.accountRole;
-  const projectRole = memberShip ? memberShip.role : PROJECT_ROLES.member;
+  const projectRole = memberShip?.role ?? "MEMBER";
 
   const rolePermission = PERMINSSIONS[projectRole];
-  if (!rolePermission) return false;
+  if (!rolePermission) return { success: false, message: "Invalid role" };
 
   const resourcePermission = rolePermission[resourceType];
-  if (!resourcePermission) return false;
+  if (!resourcePermission)
+    return { success: false, message: "Unauthorized: Insufficient permissions" };
 
   const permissionCheck = resourcePermission[action as keyof typeof resourcePermission];
 
-  if (permissionCheck === undefined || permissionCheck === null || !permissionCheck) return false;
-  if (permissionCheck === true) return true;
+  if (permissionCheck === undefined || permissionCheck === null || !permissionCheck)
+    return { success: false, message: "Invalid permission check" };
+  if (permissionCheck === true) return { success: true, message: "Permission granted" };
 
   // If func, evaluate ABAC condition
   if (typeof permissionCheck === "function") {
-    if (!resource) return false;
+    if (!resource) return { success: false, message: "Invalid: resource Not found" };
 
     const ctx = {
       user,
       member: memberShip,
       resource,
     } satisfies PermissionContext<TResouce>;
-    return permissionCheck(ctx);
+
+    return (permissionCheck(ctx) as boolean)
+      ? { success: true, message: "Permission granted!" }
+      : { success: false, message: "Unauthorized: Insufficient permissions (SubTask)" };
   }
 
-  return false;
+  return { success: false, message: "Invalid permission check" };
 }
 
 export { hasPermission };

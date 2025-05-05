@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
 import { CustomError } from "../utils/custom-error";
 import { apiResponse } from "../utils/api-response";
-import { hasPermission } from "../lib/permit";
 import { fetchMyProjectsAPI, getProjectMembersAPI, UserRequest } from "../types/type";
 import { IMember, ProjectMember } from "../models/member.model";
 import { Schema, startSession, Types } from "mongoose";
 import { IProject, Project } from "../models/project.model";
-import { PROJECT_ROLES, ProjectRole } from "../types/role";
+import { PROJECT_ROLES } from "../types/role";
 import { tryCatch } from "../utils/try-catch";
 import {
   addProjectMemberSchema,
