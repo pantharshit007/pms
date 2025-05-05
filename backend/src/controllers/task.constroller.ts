@@ -6,11 +6,13 @@ import { uploadFile } from "../lib/upload-files";
 import { UserRequest } from "../types/type";
 import { Task } from "../models/task.model";
 import { User, UserDocument } from "../models/user.model";
-import { ProjectMember } from "../models/member.model";
+import { IMember, ProjectMember } from "../models/member.model";
 import { startSession } from "mongoose";
-import { Subtask } from "../models/subtask.model";
+import { SubTask } from "../models/subtask.model";
 import { deleteContentByTag } from "../lib/delete-files";
 import { tryCatch } from "../utils/try-catch";
+import { MAX_TASK_ATTACHMENTS } from "../utils/constant";
+import { hasPermission } from "../lib/permit";
 
 async function createTask(req: Request, res: Response) {
   const session = await startSession();
@@ -26,6 +28,10 @@ async function createTask(req: Request, res: Response) {
     const { title, description, email } = parsedBody.data;
     const pId = req.params.pId;
     const user = req.user as UserRequest;
+
+    if (req.files && (req.files.length as number) > MAX_TASK_ATTACHMENTS) {
+      throw new CustomError(400, `Max attachments reached: ${MAX_TASK_ATTACHMENTS}`);
+    }
 
     const assignedTo = await User.findOne({ email }).lean();
     if (!assignedTo) throw new CustomError(400, "Invalid email");
@@ -264,7 +270,7 @@ async function deleteTask(req: Request, res: Response) {
     session.startTransaction();
 
     async function commit() {
-      await Subtask.deleteMany({ task: tId });
+      await SubTask.deleteMany({ task: tId });
       await deleteContentByTag(`tId:${tId}`); // delete attachments
       await Task.findByIdAndDelete(tId);
       return;
@@ -301,7 +307,21 @@ async function deleteTask(req: Request, res: Response) {
 
 async function updateTaskStatus(req: Request, res: Response) {
   try {
-    const { tId } = req.params as { tId: string };
+    const { pId, tId } = req.params as { pId: string; tId: string };
+    const user = req.user as UserRequest;
+    const memberShip = req.member as IMember;
+
+    const task = await Task.findById(tId).lean();
+    if (!task) throw new CustomError(400, "Task not found");
+
+    const isAllowed = hasPermission({
+      user,
+      memberShip,
+      resourceType: "Task",
+      action: "updateStatus",
+      resource: { ...task, tId },
+    });
+    if (!isAllowed.success) throw new CustomError(401, isAllowed.message);
 
     const parsedBody = updateTaskStatusSchema.safeParse(req.body);
     if (!parsedBody.success) {
@@ -312,9 +332,6 @@ async function updateTaskStatus(req: Request, res: Response) {
     }
 
     const { status } = parsedBody.data;
-
-    const task = await Task.findById(tId).lean();
-    if (!task) throw new CustomError(400, "Task not found");
 
     if (task.status === status) throw new CustomError(400, "Same status can't be assigned");
 

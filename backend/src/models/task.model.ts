@@ -15,6 +15,7 @@ export interface ITask {
   assignedBy: Schema.Types.ObjectId;
   status: TaskStatusType;
   attachments: Attatchment[];
+  subTasks: number;
 }
 
 export type TaskDocument = ITask & Document;
@@ -66,8 +67,14 @@ const taskSchema = new Schema<TaskDocument>(
         },
       ],
     },
+    subTasks: {
+      type: Number,
+      default: 0,
+      max: 10,
+    },
   },
   { timestamps: true }
 );
 
+taskSchema.index({ project: 1, assignedTo: 1 });
 export const Task = model<ITask>("Task", taskSchema);

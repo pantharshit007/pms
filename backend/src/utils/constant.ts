@@ -68,3 +68,5 @@ export const UPLOAD_FOLDERS = {
   pdf: PDF_FOLDER,
   docs: DOCS_FOLDER,
 };
+
+export const MAX_TASK_ATTACHMENTS = 5;

@@ -235,4 +235,48 @@ async function logout(req: Request, res: Response) {
   }
 }
 
-export { sendOTP, register, login, logout };
+async function refreshToken(req: Request, res: Response) {
+  try {
+    return apiResponse({
+      res,
+      success: true,
+      status: 200,
+      message: "still in work",
+    });
+  } catch (err) {
+    console.error("[REFRESH-TOKEN] Error:", err);
+    if (err instanceof CustomError) {
+      return apiResponse({
+        res,
+        success: false,
+        status: err.status ?? 500,
+        message: err.message,
+      });
+    }
+    throw err;
+  }
+}
+
+async function deleteUser(req: Request, res: Response) {
+  try {
+    return apiResponse({
+      res,
+      success: true,
+      status: 200,
+      message: "still in work",
+    });
+  } catch (err) {
+    console.error("[DELETE-USER] Error:", err);
+    if (err instanceof CustomError) {
+      return apiResponse({
+        res,
+        success: false,
+        status: err.status ?? 500,
+        message: err.message,
+      });
+    }
+    throw err;
+  }
+}
+
+export { sendOTP, register, login, logout, refreshToken, deleteUser };
