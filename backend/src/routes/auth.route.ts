@@ -6,6 +6,8 @@ import {
   sendOTP,
   refreshToken,
   deleteUser,
+  resetPassword,
+  forgotPassword,
 } from "../controllers/auth.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 
@@ -17,5 +19,7 @@ authRouter.post("/login", login);
 authRouter.post("/logout", authMiddleware, logout);
 authRouter.post("/refresh", refreshToken);
 authRouter.delete("/delete", deleteUser);
+authRouter.post("/forgot-pass", forgotPassword);
+authRouter.post("/reset-pass", resetPassword);
 
 export { authRouter };

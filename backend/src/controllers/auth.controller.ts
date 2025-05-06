@@ -279,4 +279,57 @@ async function deleteUser(req: Request, res: Response) {
   }
 }
 
-export { sendOTP, register, login, logout, refreshToken, deleteUser };
+async function forgotPassword(req: Request, res: Response) {
+  try {
+    return apiResponse({
+      res,
+      success: true,
+      status: 200,
+      message: "still in work",
+    });
+  } catch (err) {
+    console.error("[FORGOT-PASSWORD] Error:", err);
+    if (err instanceof CustomError) {
+      return apiResponse({
+        res,
+        success: false,
+        status: err.status ?? 500,
+        message: err.message,
+      });
+    }
+    throw err;
+  }
+}
+
+async function resetPassword(req: Request, res: Response) {
+  try {
+    return apiResponse({
+      res,
+      success: true,
+      status: 200,
+      message: "still in work",
+    });
+  } catch (err) {
+    console.error("[RESET-PASSWORD] Error:", err);
+    if (err instanceof CustomError) {
+      return apiResponse({
+        res,
+        success: false,
+        status: err.status ?? 500,
+        message: err.message,
+      });
+    }
+    throw err;
+  }
+}
+
+export {
+  sendOTP,
+  register,
+  login,
+  logout,
+  refreshToken,
+  deleteUser,
+  forgotPassword,
+  resetPassword,
+};

@@ -15,6 +15,10 @@ app.get("/", (req, res) => {
   res.json({ msg: "Hey mom!" });
 });
 
+app.get("/ping", (req, res) => {
+  res.json({ msg: "pong" });
+});
+
 app.use(errMiddleware);
 
 connectDB();
