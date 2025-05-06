@@ -4,10 +4,19 @@ import { errMiddleware } from "./middleware/err.middleware";
 import { env } from "./utils/env";
 import { connectDB } from "./lib/db";
 import { rootRouter } from "./routes/root.route";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: env.CLIENT_URL,
+    credentials: true,
+    maxAge: 14400,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 
 app.use("/api/v1", rootRouter);
 
